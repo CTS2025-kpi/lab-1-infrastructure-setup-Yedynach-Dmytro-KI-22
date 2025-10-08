@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Lab1 - Create ReadOnly IAM User and Role
+
+Resources:
+  # IAM User
+  ReadOnlyUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: read-only-user
+
+  # IAM Policy
+  ReadOnlyPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: Iac-ReadOnlyPolicy
+      Users:
+        - !Ref ReadOnlyUser
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "ec2:Describe*"
+              - "s3:List*"
+              - "s3:Get*"
+              - "iam:List*"
+              - "iam:Get*"
+            Resource: "*"
+
+  # IAM Role
+  ReadOnlyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: Iac-ReadOnlyRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !GetAtt ReadOnlyUser.Arn
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: ReadOnlyRolePolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "ec2:Describe*"
+                  - "s3:List*"
+                  - "s3:Get*"
+                  - "iam:List*"
+                  - "iam:Get*"
+                Resource: "*"
